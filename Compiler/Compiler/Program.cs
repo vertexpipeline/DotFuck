@@ -23,10 +23,41 @@ namespace Compiler
             gen.Emit(OpCodes.Stloc, n);
             int length = code.Length;
 
+            Stack<Label> labelsStart = new Stack<Label>();
+            Stack<Label> labelsEnd = new Stack<Label>();
+            
+            int lN = 0;
             for(int i = 0; i < length; i++) 
             {
                 switch(code[i])
                 {
+                    case '[':
+                    {
+                        gen.Emit(OpCodes.Ldloc, memory);
+                        gen.Emit(OpCodes.Ldloc, n);
+                        gen.Emit(OpCodes.Ldelem, typeof(byte));
+                        gen.Emit(OpCodes.Ldc_I4_0);
+                        var stLabel = gen.DefineLabel();
+                        labelsStart.Push(stLabel);
+                        var endLabel = gen.DefineLabel();
+                        labelsEnd.Push(endLabel);
+
+                        gen.Emit(OpCodes.Beq, endLabel);
+                        gen.MarkLabel(stLabel);
+                    }
+                    break;
+
+                    case ']':
+                    {
+                        gen.Emit(OpCodes.Ldloc, memory);
+                        gen.Emit(OpCodes.Ldloc, n);
+                        gen.Emit(OpCodes.Ldelem, typeof(byte));
+                        gen.Emit(OpCodes.Ldc_I4_1);
+                        gen.Emit(OpCodes.Bge, labelsStart.Pop());
+                        gen.MarkLabel(labelsEnd.Pop());
+                    }
+                    break;
+
                     case '+':
                     {
                         int count = 1;
@@ -127,8 +158,8 @@ namespace Compiler
             var type = module.DefineType("BFProgram", TypeAttributes.Class | TypeAttributes.Public);
             var method = type.DefineMethod("Main", MethodAttributes.Static | MethodAttributes.Public | MethodAttributes.HideBySig, typeof(void), new Type[] { typeof(string[])});
             var gen = method.GetILGenerator();
-            var genMethodRes = GenerateMethod(gen, @"++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++.+++++++++++++++++++++++++++++.+++++++..+++.-------------------------------------------------------------------------------.+++++++++++++++++++++++++++++++++++++++++++++++++++++++.++++++++++++++++++++++++.+++.------.--------.-------------------------------------------------------------------.-----------------------.");
-            //var genMethodRes = GenerateMethod(gen, ",++.");
+            //var genMethodRes = GenerateMethod(gen, Console.ReadLine());
+            var genMethodRes = GenerateMethod(gen, "++++++[>++++++++++<-]>.");
             type.CreateType();
             assBuilder.SetEntryPoint(method, PEFileKinds.ConsoleApplication);
             if(genMethodRes)

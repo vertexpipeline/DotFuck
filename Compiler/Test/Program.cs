@@ -1,19 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// Decompiled with JetBrains decompiler
+// Type: BFProgram
+// Assembly: BF, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 0F217B4A-3C28-4953-9660-9C240E9557D3
+// Assembly location: C:\Users\verte\Source\Repos\DotFuck\Compiler\Compiler\bin\Debug\bf.exe
 
-namespace Test
+using System;
+using System.Runtime.InteropServices;
+
+public class BFProgram
 {
-    class Program
+    public static void Main([In] string[] obj0)
     {
-        static void Main(string[] args)
+        byte[] numArray = new byte[30000];
+        int index1 = 0;
+        numArray[index1] = (byte)((int)numArray[index1] + (int)Convert.ToByte(6));
+        if((int)numArray[index1] != 0)
         {
-            int[] a;
-            a = new int[30000];
-            a[12] = 33;
-            int c = a[12];
+            do
+            {
+                int index2 = index1 + 1;
+                numArray[index2] = (byte)((int)numArray[index2] + (int)Convert.ToByte(10));
+                index1 = index2 - 1;
+                numArray[index1] = (byte)((int)numArray[index1] - (int)Convert.ToByte(1));
+            }
+            while((int)numArray[index1] >= 1);
         }
+        int index3 = index1 + 1;
+        Console.Write((char)numArray[index3]);
+        Console.WriteLine("\nProgram ended... press any key");
+        Console.Read();
     }
 }
